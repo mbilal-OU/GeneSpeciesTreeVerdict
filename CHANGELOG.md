@@ -5,11 +5,36 @@ All notable changes to this project will be documented here.
 ## [Unreleased]
 
 ### Planned
-- quantitative simulation benchmark across broader evolutionary regimes;
+- process-realistic SimPhy/Zombi benchmark datasets using the external truth-manifest interface;
+- sequence simulation followed by gene-tree re-estimation;
+- empirical benchmark datasets with independently curated orthology/paralogy evidence;
 - external reconciliation adapters;
 - real-data adapters for common pangenome/orthology outputs;
 - stronger uncertainty handling;
 - stable packaging and archival release after validation.
+
+## [0.3.0] - 2026-09-25
+
+### Added
+- reproducible `gstv benchmark` command;
+- seeded native known-truth structural stress simulator;
+- benchmark scenarios for concordant single-copy loci, branch-length-only variation, single-copy topology discordance, sampled multicopy duplication, pseudo-orthology-like structure, missing taxa and gene-tree error;
+- YAML-configurable smoke and full benchmark grids;
+- external truth-manifest mode for independent simulators such as SimPhy and Zombi;
+- per-state precision, recall and F1 metrics;
+- expected-vs-observed workflow confusion matrix;
+- scenario-level accuracy summaries;
+- false-`RESOLVE` safety metrics for no-duplication and single-copy/no-duplication truth;
+- `RESOLVE` sensitivity metric for sampled multicopy duplication truth;
+- exact truth manifests with seeds and generated tree paths;
+- machine-readable failure-case table;
+- benchmark summary figure and Markdown report;
+- scientific validation documentation separating structural stress tests from process-realistic simulation.
+
+### Changed
+- package description now includes validation explicitly;
+- console entrypoint now registers the benchmark command while preserving the existing analysis commands;
+- runtime dependencies now include PyYAML for benchmark configuration.
 
 ## [0.2.0] - 2026-09-25
 
