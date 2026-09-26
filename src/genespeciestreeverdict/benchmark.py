@@ -368,7 +368,9 @@ def run_native_benchmark(
                     discordance_review_threshold=config.discordance_review_threshold,
                 )
                 acceptable = result.verdict.status in truth.expected_statuses
-                false_resolve = result.verdict.status == "RESOLVE" and not truth.truth_has_duplication
+                false_resolve = (
+                    result.verdict.status == "RESOLVE" and not truth.truth_has_duplication
+                )
                 records.append(
                     BenchmarkRecord(
                         benchmark_id=benchmark_id,
@@ -539,11 +541,15 @@ def benchmark_summary(records: list[BenchmarkRecord]) -> dict[str, float | int]:
     total = len(records)
     acceptable = sum(record.acceptable for record in records)
     true_resolve = [
-        record for record in records if record.truth_has_duplication and not record.truth_single_copy
+        record
+        for record in records
+        if record.truth_has_duplication and not record.truth_single_copy
     ]
     no_dup = [record for record in records if not record.truth_has_duplication]
     single_copy_no_dup = [
-        record for record in records if record.truth_single_copy and not record.truth_has_duplication
+        record
+        for record in records
+        if record.truth_single_copy and not record.truth_has_duplication
     ]
     resolve_tp = sum(record.observed_status == "RESOLVE" for record in true_resolve)
     resolve_fp = sum(record.observed_status == "RESOLVE" for record in no_dup)
