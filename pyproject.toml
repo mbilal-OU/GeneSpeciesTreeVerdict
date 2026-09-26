@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "genespeciestreeverdict"
+version = "0.1.0"
+description = "Diagnose gene-tree/species-tree discordance and evaluate loci for phylogenomic use."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+  {name = "Muhammad Bilal"}
+]
+keywords = [
+  "phylogenetics",
+  "phylogenomics",
+  "gene tree",
+  "species tree",
+  "tree reconciliation",
+  "orthology",
+  "paralogy"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Bio-Informatics"
+]
+dependencies = [
+  "biopython>=1.84,<2",
+  "matplotlib>=3.8,<4",
+  "rich>=13,<15",
+  "typer>=0.12,<1"
+]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2",
+  "mkdocs>=1.6",
+  "mkdocs-material>=9.5",
+  "pytest>=8",
+  "pytest-cov>=5",
+  "ruff>=0.8"
+]
+
+[project.urls]
+Homepage = "https://github.com/mbilal-OU/GeneSpeciesTreeVerdict"
+Repository = "https://github.com/mbilal-OU/GeneSpeciesTreeVerdict"
+Issues = "https://github.com/mbilal-OU/GeneSpeciesTreeVerdict/issues"
+Documentation = "https://github.com/mbilal-OU/GeneSpeciesTreeVerdict/tree/main/docs"
+
+[project.scripts]
+gstv = "genespeciestreeverdict.cli:app"
+genespeciestreeverdict = "genespeciestreeverdict.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.coverage.run]
+source = ["genespeciestreeverdict"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = ["examples"]
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
