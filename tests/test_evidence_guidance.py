@@ -36,8 +36,7 @@ def test_singlecopy_discordance_does_not_claim_paralogy(tutorial_dir):
     assert evidence["topology"].signal == "FLAG"
     assert "not cause-specific" in evidence["topology"].limitation
     assert any(
-        "uniquely demonstrated" in statement
-        for statement in result.verdict.unsupported_conclusions
+        "uniquely demonstrated" in statement for statement in result.verdict.unsupported_conclusions
     )
     assert any("well supported" in item.question for item in result.next_analyses)
 
