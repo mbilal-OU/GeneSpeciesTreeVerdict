@@ -10,6 +10,7 @@ from rich.table import Table
 from . import __version__
 from .analysis import analyze_locus
 from .batch import analyze_directory
+from .knowledge import explain_topic, topic_names
 from .plotting import plot_tree_comparison
 from .reporting import write_locus_outputs
 from .tutorial import write_tutorial_dataset
@@ -17,7 +18,10 @@ from .tutorial import write_tutorial_dataset
 app = typer.Typer(
     add_completion=False,
     no_args_is_help=True,
-    help="Diagnose gene-tree/species-tree discordance and evaluate locus handling.",
+    help=(
+        "Integrate evidence from gene and species trees, diagnose discordance, and route loci "
+        "to defensible next analyses."
+    ),
 )
 console = Console()
 
@@ -27,6 +31,7 @@ def _show_result(result) -> None:
     table.add_column("Metric")
     table.add_column("Value")
     table.add_row("Verdict", result.verdict.status)
+    table.add_row("Primary concern", result.verdict.primary_concern)
     table.add_row("Topology", result.verdict.topology_signal)
     table.add_row("Coverage", f"{result.coverage:.1%}")
     table.add_row("Maximum copies/species", str(result.max_copies))
@@ -40,8 +45,18 @@ def _show_result(result) -> None:
         else "NA",
     )
     console.print(table)
+    console.print("\n[bold]What the evidence supports[/bold]")
+    for statement in result.verdict.supported_conclusions:
+        console.print(f"• {statement}")
+    console.print("\n[bold]What it does not establish[/bold]")
+    for statement in result.verdict.unsupported_conclusions:
+        console.print(f"• {statement}")
     console.print("\n[bold]Recommended action[/bold]")
     console.print(result.verdict.recommended_action)
+    if result.next_analyses:
+        next_item = result.next_analyses[0]
+        console.print("\n[bold]Top next question[/bold]")
+        console.print(f"[{next_item.priority}] {next_item.question}")
     console.print("\n[dim]" + result.verdict.caution + "[/dim]")
 
 
@@ -78,7 +93,7 @@ def analyze(
     outdir: Annotated[Path, typer.Option("--outdir")] = Path("gstv_result"),
     plot: Annotated[bool, typer.Option("--plot/--no-plot")] = True,
 ) -> None:
-    """Analyze one gene tree against a reference species tree."""
+    """Analyze one gene tree and produce an evidence-based locus assessment."""
 
     result = analyze_locus(
         species_tree,
@@ -119,7 +134,7 @@ def batch_command(
     recursive: Annotated[bool, typer.Option("--recursive")] = False,
     outdir: Annotated[Path, typer.Option("--outdir")] = Path("gstv_batch"),
 ) -> None:
-    """Analyze a directory of gene trees and summarize reference-tree support."""
+    """Analyze many gene trees and summarize evidence, routing, and reference-tree support."""
 
     results, errors = analyze_directory(
         species_tree,
@@ -145,6 +160,36 @@ def batch_command(
     table.add_row("ERROR", str(len(errors)))
     console.print(table)
     console.print(f"Outputs: [bold]{outdir}[/bold]")
+
+
+@app.command()
+def explain(
+    topic: Annotated[
+        str,
+        typer.Argument(
+            help=(
+                "Concept to explain. Use 'list' to show topics: discordance, paralogy, single-copy, "
+                "rf, reconciliation, ils, hgt, marker-selection."
+            )
+        ),
+    ],
+) -> None:
+    """Explain a gene-tree/species-tree concept and its decision implications."""
+
+    if topic.strip().lower() == "list":
+        console.print("Available topics:")
+        for name in topic_names():
+            console.print(f"• {name}")
+        return
+    try:
+        entry = explain_topic(topic)
+    except ValueError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from exc
+    console.print(f"[bold]{entry['title']}[/bold]\n")
+    console.print(entry["answer"])
+    console.print("\n[bold]Decision implication[/bold]")
+    console.print(entry["decision"])
 
 
 @app.command()
