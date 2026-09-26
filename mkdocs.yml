@@ -1,0 +1,27 @@
+site_name: GeneSpeciesTreeVerdict
+site_description: Diagnose gene-tree/species-tree discordance before deciding how to use a locus.
+repo_url: https://github.com/mbilal-OU/GeneSpeciesTreeVerdict
+repo_name: mbilal-OU/GeneSpeciesTreeVerdict
+
+theme:
+  name: material
+
+nav:
+  - Home: index.md
+  - Quick start: quickstart.md
+  - Core concepts: concepts.md
+  - Simulated tutorial: tutorial.md
+  - Real-data workflow: real-data-workflow.md
+  - Input formats: input-formats.md
+  - Decision framework: decision-framework.md
+  - Interpreting discordance: interpretation.md
+  - Scientific background: scientific-background.md
+  - Limitations: limitations.md
+  - FAQ: faq.md
+  - Maintainer guide: maintainer-guide.md
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true

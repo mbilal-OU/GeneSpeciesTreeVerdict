@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use GeneSpeciesTreeVerdict, please cite the software version or commit used in your analysis."
+title: "GeneSpeciesTreeVerdict"
+type: software
+authors:
+  - family-names: "Bilal"
+    given-names: "Muhammad"
+repository-code: "https://github.com/mbilal-OU/GeneSpeciesTreeVerdict"
+url: "https://github.com/mbilal-OU/GeneSpeciesTreeVerdict"
+license: MIT
+version: 0.1.0
+abstract: >-
+  A phylogenomic diagnostic toolkit for comparing gene trees with a reference species tree,
+  screening copy-number and duplication signals, quantifying topology discordance, and
+  producing transparent locus-handling assessments.
+keywords:
+  - phylogenetics
+  - phylogenomics
+  - gene tree
+  - species tree
+  - reconciliation
+  - orthology
+  - paralogy
