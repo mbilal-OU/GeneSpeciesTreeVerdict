@@ -57,10 +57,14 @@ def analyze(
     species_field: Annotated[int, typer.Option("--species-field", min=0)] = 0,
     min_coverage: Annotated[float, typer.Option("--min-coverage", min=0.01, max=1.0)] = 0.95,
     rooted_comparison: Annotated[
-        bool, typer.Option("--rooted-comparison", help="Compare rooted clades instead of unrooted splits.")
+        bool,
+        typer.Option(
+            "--rooted-comparison", help="Compare rooted clades instead of unrooted splits."
+        ),
     ] = False,
     no_reconcile: Annotated[
-        bool, typer.Option("--no-reconcile", help="Skip rooted duplication-loss LCA reconciliation.")
+        bool,
+        typer.Option("--no-reconcile", help="Skip rooted duplication-loss LCA reconciliation."),
     ] = False,
     discordance_review_threshold: Annotated[
         Optional[float],
@@ -90,7 +94,9 @@ def analyze(
     )
     write_locus_outputs(result, outdir)
     if plot:
-        plot_tree_comparison(species_tree, gene_tree, outdir / "tree_comparison.png", title=result.family)
+        plot_tree_comparison(
+            species_tree, gene_tree, outdir / "tree_comparison.png", title=result.family
+        )
     _show_result(result)
     console.print(f"\nOutputs: [bold]{outdir}[/bold]")
 
