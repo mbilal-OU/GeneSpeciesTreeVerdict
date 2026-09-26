@@ -26,7 +26,9 @@ def make_verdict(
             supported.append("The compared gene-tree and species-tree bipartitions are concordant.")
         else:
             topology_signal = "DISCORDANT"
-            supported.append("The gene tree contains topological discordance relative to the reference tree.")
+            supported.append(
+                "The gene tree contains topological discordance relative to the reference tree."
+            )
     else:
         topology_signal = "NOT_COMPARABLE"
 
@@ -39,7 +41,9 @@ def make_verdict(
         supported.append(
             "The complete sampled family is not a conventional single-copy marker in its current form."
         )
-        unsupported.append("The current evidence identifies which individual copy is the correct ortholog.")
+        unsupported.append(
+            "The current evidence identifies which individual copy is the correct ortholog."
+        )
         recommended = (
             "Do not concatenate the full family as a conventional single-copy marker. Resolve "
             "orthology/paralogy first, or use a method designed for multi-copy gene families."
@@ -67,7 +71,9 @@ def make_verdict(
             f"Taxon coverage ({coverage:.1%}) is below the configured threshold ({min_coverage:.1%})."
         )
         supported.append("The locus does not meet the configured prevalence threshold.")
-        unsupported.append("Missingness is necessarily biological rather than technical or annotation-related.")
+        unsupported.append(
+            "Missingness is necessarily biological rather than technical or annotation-related."
+        )
         recommended = (
             "Review missing taxa, annotation/orthogroup assignment, and your core-gene threshold before "
             "including this locus in the target marker set."
@@ -102,9 +108,7 @@ def make_verdict(
         reasons.append(
             "Normalized RF distance exceeds the user-selected discordance review threshold."
         )
-        recommended = (
-            "Review branch support and biological alternatives before deciding whether to retain the locus."
-        )
+        recommended = "Review branch support and biological alternatives before deciding whether to retain the locus."
 
     if topology_signal == "DISCORDANT":
         reasons.append(
