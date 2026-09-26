@@ -1,6 +1,6 @@
 from typer.testing import CliRunner
 
-from genespeciestreeverdict.cli import app
+from genespeciestreeverdict.entrypoint import app
 
 
 runner = CliRunner()
@@ -9,7 +9,7 @@ runner = CliRunner()
 def test_version_command():
     result = runner.invoke(app, ["version"])
     assert result.exit_code == 0
-    assert "0.2.0" in result.stdout
+    assert "0.3.0" in result.stdout
 
 
 def test_tutorial_command(tmp_path):
@@ -80,3 +80,26 @@ def test_batch_cli(tutorial_dir, tmp_path):
     assert (out / "locus_summary.tsv").exists()
     assert (out / "evidence_matrix.tsv").exists()
     assert (out / "recommendations.tsv").exists()
+
+
+def test_benchmark_cli(tmp_path):
+    config = tmp_path / "benchmark.yaml"
+    config.write_text(
+        "seed: 44\n"
+        "replicates: 1\n"
+        "taxa: [8]\n"
+        "scenarios: [concordant_singlecopy, multicopy_duplication]\n",
+        encoding="utf-8",
+    )
+    out = tmp_path / "benchmark"
+    result = runner.invoke(
+        app,
+        ["benchmark", "--config", str(config), "--outdir", str(out)],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert "GeneSpeciesTreeVerdict benchmark" in result.stdout
+    assert "False RESOLVE" in result.stdout
+    assert (out / "performance_summary.tsv").exists()
+    assert (out / "truth_manifest.tsv").exists()
+    assert (out / "scenario_accuracy.png").exists()

@@ -1,0 +1,15 @@
+seed: 20260926
+replicates: 100
+taxa: [8, 16, 32, 64]
+min_coverage: 0.95
+missing_fraction: 0.25
+branch_length_sigma: 0.35
+gene_tree_error_swaps: 3
+scenarios:
+  - concordant_singlecopy
+  - branch_length_only
+  - singlecopy_discordance
+  - multicopy_duplication
+  - pseudoorthology
+  - missing_taxa
+  - gene_tree_error

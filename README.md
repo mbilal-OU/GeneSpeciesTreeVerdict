@@ -5,15 +5,15 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Status](https://img.shields.io/badge/status-alpha-orange)
 
-**From gene-tree/species-tree discordance to a transparent phylogenomic decision.**
+**From gene-tree/species-tree discordance to a transparent, testable phylogenomic decision.**
 
-GeneSpeciesTreeVerdict (`gstv`) is an open-source **evidence-integration and decision-support framework** for researchers who already have gene trees and a reference species tree and need to answer a practical question:
+GeneSpeciesTreeVerdict (`gstv`) is an open-source **evidence-integration, validation, and decision-support framework** for researchers who already have gene trees and a reference species tree and need to answer a practical question:
 
 > **My gene tree disagrees with my species tree. What evidence do I actually have, what can I legitimately conclude, how should I handle this locus, and what analysis should I run next?**
 
-The software does **not** assume the species tree is automatically correct. It does **not** call a locus paralogous simply because its topology differs from the species tree. And it does **not** attempt to replace specialist reconciliation, orthology, coalescent, HGT, or recombination methods.
+The software does **not** assume the supplied species tree is automatically correct. It does **not** call a locus paralogous simply because its topology differs from the species tree. It does **not** replace specialist reconciliation, orthology, coalescent, HGT, or recombination methods.
 
-Instead, it connects those analyses through a transparent workflow.
+Instead, it connects those analyses through an auditable workflow and now includes a benchmark layer that can test the workflow against known truth.
 
 ---
 
@@ -28,6 +28,8 @@ Many excellent tools already solve specialist phylogenetic problems:
 | [ASTRAL / ASTRAL-Pro3](https://github.com/chaoszhang/ASTER) | species-tree inference from gene trees, including multi-copy families in ASTRAL-Pro3 |
 | [Notung](https://www.cs.cmu.edu/~durand/Notung/) / RANGER-DTL-class methods | reconciliation under explicit evolutionary-event models |
 | [DiscoVista](https://github.com/esayyari/DiscoVista) | visualization of phylogenetic discordance |
+| [SimPhy](https://academic.oup.com/sysbio/article/65/2/334/2427219) | process-realistic phylogenomic simulation including ILS, duplication/loss and HGT |
+| [Zombi](https://academic.oup.com/bioinformatics/article/36/4/1286/5578480) | species-tree, genome and sequence simulation with duplication/loss/transfer |
 
 GeneSpeciesTreeVerdict asks a different question:
 
@@ -51,7 +53,7 @@ Read the full rationale: **[Why GeneSpeciesTreeVerdict exists](docs/why-this-too
 
 ---
 
-## What v0.2 does
+## What v0.3 does
 
 For every locus, GeneSpeciesTreeVerdict integrates:
 
@@ -81,6 +83,10 @@ For every locus, GeneSpeciesTreeVerdict integrates:
                     PASS / REVIEW / RESOLVE
                              |
                  specialist method if needed
+                             |
+                       benchmark layer
+                             |
+                 known truth vs observed
 ```
 
 ### Per-locus evidence
@@ -116,40 +122,14 @@ Batch mode does not merely ask whether genes agree with the reference tree. For 
 
 This helps distinguish “one problematic locus” from “a reference branch that is repeatedly disputed across loci.”
 
----
+### Validation layer
 
-## Example interpretation
+v0.3 adds a reproducible benchmark system with two deliberately separate levels:
 
-Imagine a locus with one sequence per species but strong topological conflict:
+1. **Native known-truth structural stress tests** — seeded tests where copy number, coverage and topology manipulations are known exactly.
+2. **External truth-manifest mode** — lets independently simulated datasets from tools such as SimPhy or Zombi be scored without pretending GSTV's lightweight generator is a complete evolutionary simulator.
 
-```text
-Verdict: REVIEW
-Primary concern: MODEL_DEPENDENT_DUPLICATION_SIGNAL
-
-Evidence
-Taxon coverage             SUPPORT
-Copy number                SUPPORT
-Species overlap            NEUTRAL
-Topology                    FLAG
-DL reconciliation           FLAG
-
-What is supported
-- the locus is topologically discordant with the supplied species tree;
-- a duplication-loss history can reconcile the supplied rooted trees under the native model.
-
-What is not established
-- the locus is definitely paralogous;
-- duplication is definitely the biological cause;
-- the supplied species tree is necessarily correct.
-
-Top next questions
-1. Is the conflicting gene-tree signal well supported?
-2. Is the reference branch broadly supported across independent loci?
-3. Does a specialist DTL analysis support the same explanation?
-4. Are ILS, HGT/recombination, or other processes plausible in this dataset?
-```
-
-That is the intended product: **a defensible research workflow, not a one-number filter**.
+This separation reduces circular validation.
 
 ---
 
@@ -226,7 +206,7 @@ gstv_batch/
 └── report.md
 ```
 
-### 3. Learn a concept from the CLI
+### 3. Explain a concept
 
 ```bash
 gstv explain list
@@ -240,7 +220,7 @@ gstv explain hgt
 gstv explain marker-selection
 ```
 
-The explanations use the same rule as the analysis engine:
+The explanations follow the same rule as the analysis engine:
 
 > observation first, causal claim only when justified.
 
@@ -267,6 +247,63 @@ gstv batch \
   --mapping gstv_tutorial/mapping.tsv \
   --outdir gstv_tutorial/results
 ```
+
+### 5. Benchmark the decision engine
+
+Run the fast reproducible benchmark:
+
+```bash
+gstv benchmark \
+  --config benchmarks/smoke.yaml \
+  --outdir benchmark_results/smoke
+```
+
+Run the larger validation grid:
+
+```bash
+gstv benchmark \
+  --config benchmarks/full.yaml \
+  --outdir benchmark_results/full
+```
+
+The full configuration currently contains:
+
+```text
+4 taxon counts × 7 scenarios × 100 replicates = 2,800 benchmark cases
+```
+
+Use externally simulated truth:
+
+```bash
+gstv benchmark \
+  --truth-manifest external_simulation/truth_manifest.tsv \
+  --outdir benchmark_results/external
+```
+
+Benchmark outputs include:
+
+```text
+benchmark_results/
+├── truth_manifest.tsv
+├── locus_results.tsv
+├── performance_summary.tsv
+├── scenario_metrics.tsv
+├── class_metrics.tsv
+├── confusion_matrix.tsv
+├── failure_cases.tsv
+├── scenario_accuracy.png
+└── benchmark_report.md
+```
+
+Key safety metrics include:
+
+- `RESOLVE` sensitivity for explicit sampled multicopy duplication;
+- false-`RESOLVE` rate when no duplication was simulated;
+- false-`RESOLVE` rate for single-copy/no-duplication truth.
+
+The last two directly test the project's central safeguard: **discordance must not silently become a paralogy decision**.
+
+See **[Benchmarking and scientific validation](docs/benchmarking.md)**.
 
 ---
 
@@ -299,7 +336,7 @@ Depending on the scientific goal, the next step may instead be to use a method d
 
 ## Evidence matrix
 
-The key v0.2 output is `evidence_matrix.tsv`.
+The key evidence output is `evidence_matrix.tsv`.
 
 Each row contains:
 
@@ -324,8 +361,6 @@ See **[Evidence matrix](docs/evidence-matrix.md)**.
 GeneSpeciesTreeVerdict does not say “run GeneRax” simply because a tree differs.
 
 It asks what remains unresolved.
-
-Examples:
 
 | Evidence pattern | Next question | Example method class |
 |---|---|---|
@@ -376,7 +411,9 @@ GeneSpeciesTreeVerdict currently does **not** claim to perform:
 
 The native DL reconciliation is deliberately a transparent screening model.
 
-For that reason, the project should be described as an **evidence-integration and decision-support framework**, not as a replacement for specialist phylogenetic inference methods.
+The native benchmark is deliberately a **structural stress test**, not a complete generative model of ILS, HGT, recombination or sequence evolution.
+
+For that reason, the project should be described as an **evidence-integration, validation, and decision-support framework**, not as a replacement for specialist phylogenetic inference methods.
 
 ---
 
@@ -384,11 +421,18 @@ For that reason, the project should be described as an **evidence-integration an
 
 The software is currently **alpha**.
 
-The test suite covers software behavior and the deterministic teaching scenarios. Broader simulation benchmarking across duplication/loss, gene-tree error, missing taxa, and other discordance regimes remains an active research objective.
+v0.3 provides reproducible native known-truth benchmarking, exact simulation seeds, failure-case reporting and an external simulator interface. This is an important step beyond software unit testing, but it is not the end of scientific validation.
 
-A stable release, archival DOI, and software-paper claims should follow quantitative benchmarking, at least one empirical case study, and external-user validation.
+Before a stable methodological claim or software paper, the project should additionally include:
 
-See the public roadmap and issues before interpreting this repository as a fully validated phylogenetic method.
+1. replicated SimPhy experiments across ILS, duplication/loss/transfer rates, taxa and gene-tree error;
+2. independent microbial DTL simulation with a simulator such as Zombi;
+3. sequence simulation followed by gene-tree re-estimation;
+4. empirical benchmark datasets with independently curated orthology/paralogy or reconciliation evidence;
+5. explicit reporting of failure regimes and ambiguous cases;
+6. external-user validation.
+
+A stable release, archival DOI and software-paper claims should follow those validation steps rather than precede them.
 
 ---
 
@@ -398,6 +442,7 @@ See the public roadmap and issues before interpreting this repository as a fully
 - [Quick start](docs/quickstart.md)
 - [Evidence matrix](docs/evidence-matrix.md)
 - [Tool routing](docs/tool-routing.md)
+- [Benchmarking and validation](docs/benchmarking.md)
 - [Core concepts](docs/concepts.md)
 - [Simulated tutorial](docs/tutorial.md)
 - [Real-data workflow](docs/real-data-workflow.md)
@@ -417,6 +462,7 @@ The repository uses:
 - Python 3.10–3.13 CI;
 - `pytest` and coverage;
 - Ruff linting/formatting;
+- a benchmark smoke run inside CI;
 - strict MkDocs builds;
 - package build validation;
 - Dependabot;
@@ -461,4 +507,4 @@ MIT License. See [LICENSE](LICENSE).
 
 ## One-sentence scope
 
-> **GeneSpeciesTreeVerdict integrates gene-tree/species-tree evidence, states what that evidence can and cannot establish, and routes each locus toward a transparent phylogenomic workflow decision.**
+> **GeneSpeciesTreeVerdict integrates gene-tree/species-tree evidence, states what that evidence can and cannot establish, benchmarks its workflow decisions against known truth, and routes each locus toward a transparent phylogenomic next step.**

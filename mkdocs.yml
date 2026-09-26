@@ -1,5 +1,5 @@
 site_name: GeneSpeciesTreeVerdict
-site_description: Evidence integration and decision support for gene-tree/species-tree discordance.
+site_description: Evidence integration, decision support, and validation for gene-tree/species-tree discordance.
 repo_url: https://github.com/mbilal-OU/GeneSpeciesTreeVerdict
 repo_name: mbilal-OU/GeneSpeciesTreeVerdict
 
@@ -12,6 +12,7 @@ nav:
   - Quick start: quickstart.md
   - Evidence matrix: evidence-matrix.md
   - Tool routing: tool-routing.md
+  - Benchmarking & validation: benchmarking.md
   - Core concepts: concepts.md
   - Simulated tutorial: tutorial.md
   - Real-data workflow: real-data-workflow.md
