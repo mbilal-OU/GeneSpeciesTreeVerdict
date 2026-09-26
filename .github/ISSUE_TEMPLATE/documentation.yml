@@ -1,0 +1,22 @@
+name: Documentation improvement
+description: Report unclear, missing, or misleading documentation
+title: "[Docs]: "
+labels: [documentation]
+body:
+  - type: textarea
+    id: location
+    attributes:
+      label: Documentation location
+      description: Point to the page, section, command, or example.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is unclear or missing?
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement
