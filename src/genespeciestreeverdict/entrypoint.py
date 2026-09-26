@@ -17,16 +17,12 @@ from .cli import app, console
 
 @app.command(name="benchmark")
 def benchmark_command(
-    config: Annotated[
-        Optional[Path], typer.Option("--config", exists=True, dir_okay=False)
-    ] = None,
+    config: Annotated[Optional[Path], typer.Option("--config", exists=True, dir_okay=False)] = None,
     truth_manifest: Annotated[
         Optional[Path], typer.Option("--truth-manifest", exists=True, dir_okay=False)
     ] = None,
     outdir: Annotated[Path, typer.Option("--outdir")] = Path("gstv_benchmark"),
-    min_coverage: Annotated[
-        float, typer.Option("--min-coverage", min=0.01, max=1.0)
-    ] = 0.95,
+    min_coverage: Annotated[float, typer.Option("--min-coverage", min=0.01, max=1.0)] = 0.95,
     discordance_review_threshold: Annotated[
         Optional[float],
         typer.Option("--discordance-review-threshold", min=0.0, max=1.0),
