@@ -67,7 +67,9 @@ def extract_splits(
             key = _canonical_unrooted(side, universe)
         splits.add(key)
         value = float(clade.confidence) if clade.confidence is not None else None
-        if key not in supports or (value is not None and (supports[key] is None or value > supports[key])):
+        if key not in supports or (
+            value is not None and (supports[key] is None or value > supports[key])
+        ):
             supports[key] = value
 
     return SplitCollection(frozenset(universe), splits, supports)
