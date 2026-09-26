@@ -101,9 +101,7 @@ def write_locus_outputs(result: LocusResult, outdir: str | Path) -> Path:
                 result.species_overlap_duplications,
                 result.reconciliation.lca_duplications,
                 result.reconciliation.inferred_losses,
-                result.topology.rf_distance
-                if result.topology.rf_distance is not None
-                else "NA",
+                result.topology.rf_distance if result.topology.rf_distance is not None else "NA",
                 (
                     f"{result.topology.normalized_rf:.6f}"
                     if result.topology.normalized_rf is not None
