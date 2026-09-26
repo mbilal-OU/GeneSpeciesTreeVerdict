@@ -1,5 +1,5 @@
 site_name: GeneSpeciesTreeVerdict
-site_description: Diagnose gene-tree/species-tree discordance before deciding how to use a locus.
+site_description: Evidence integration and decision support for gene-tree/species-tree discordance.
 repo_url: https://github.com/mbilal-OU/GeneSpeciesTreeVerdict
 repo_name: mbilal-OU/GeneSpeciesTreeVerdict
 
@@ -8,7 +8,10 @@ theme:
 
 nav:
   - Home: index.md
+  - Why this tool exists: why-this-tool.md
   - Quick start: quickstart.md
+  - Evidence matrix: evidence-matrix.md
+  - Tool routing: tool-routing.md
   - Core concepts: concepts.md
   - Simulated tutorial: tutorial.md
   - Real-data workflow: real-data-workflow.md
