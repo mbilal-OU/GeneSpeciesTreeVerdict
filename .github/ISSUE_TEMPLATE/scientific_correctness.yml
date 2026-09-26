@@ -1,0 +1,27 @@
+name: Scientific correctness concern
+description: Report a potentially incorrect biological or phylogenetic interpretation
+title: "[Scientific correctness]: "
+body:
+  - type: textarea
+    id: claim
+    attributes:
+      label: What result or interpretation concerns you?
+      description: Quote the verdict, metric or documentation statement precisely.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why might it be scientifically incorrect?
+      description: Explain the competing interpretation/model and include references when possible.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproducible example
+      description: Provide minimal trees, mapping and command when sharable.
+  - type: textarea
+    id: references
+    attributes:
+      label: Relevant literature or software
