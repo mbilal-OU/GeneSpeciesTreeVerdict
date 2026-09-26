@@ -53,7 +53,9 @@ def make_verdict(
         )
     else:
         status = "PASS"
-        reasons.append("The locus is single-copy across mapped taxa and meets the coverage threshold.")
+        reasons.append(
+            "The locus is single-copy across mapped taxa and meets the coverage threshold."
+        )
         recommended = (
             "This locus is structurally suitable as a candidate conventional phylogenomic marker. "
             "Topology discordance should still be interpreted rather than automatically filtered."
@@ -70,9 +72,7 @@ def make_verdict(
         reasons.append(
             "Normalized RF distance exceeds the user-selected discordance review threshold."
         )
-        recommended = (
-            "Review branch support and biological alternatives before deciding whether to retain the locus."
-        )
+        recommended = "Review branch support and biological alternatives before deciding whether to retain the locus."
 
     if topology_signal == "DISCORDANT":
         reasons.append(
