@@ -1,0 +1,26 @@
+name: Feature request
+description: Propose a new analysis, adapter, report or workflow
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Research problem
+      description: What user question cannot currently be answered?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: assumptions
+    attributes:
+      label: Scientific assumptions and references
+      description: Which evolutionary model or software behavior would this rely on?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
