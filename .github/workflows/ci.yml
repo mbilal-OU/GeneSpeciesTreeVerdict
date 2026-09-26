@@ -41,6 +41,14 @@ jobs:
       - name: Test with coverage
         run: pytest --cov=genespeciestreeverdict --cov-report=term-missing --cov-report=xml
 
+      - name: Benchmark smoke test
+        if: matrix.python-version == '3.12'
+        run: |
+          gstv benchmark --config benchmarks/smoke.yaml --outdir benchmark_smoke
+          test -s benchmark_smoke/performance_summary.tsv
+          test -s benchmark_smoke/failure_cases.tsv
+          test -s benchmark_smoke/scenario_accuracy.png
+
       - name: Build documentation
         run: mkdocs build --strict
 
