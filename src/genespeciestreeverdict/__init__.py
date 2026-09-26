@@ -1,7 +1,14 @@
-"""GeneSpeciesTreeVerdict: diagnostic gene-tree/species-tree comparison."""
+"""GeneSpeciesTreeVerdict: evidence-based gene-tree/species-tree decision support."""
 
 from .analysis import analyze_locus
-from .models import LocusResult, TopologyMetrics, Verdict
+from .models import EvidenceItem, LocusResult, NextAnalysis, TopologyMetrics, Verdict
 
-__all__ = ["LocusResult", "TopologyMetrics", "Verdict", "analyze_locus"]
-__version__ = "0.1.0"
+__all__ = [
+    "EvidenceItem",
+    "LocusResult",
+    "NextAnalysis",
+    "TopologyMetrics",
+    "Verdict",
+    "analyze_locus",
+]
+__version__ = "0.2.0"
