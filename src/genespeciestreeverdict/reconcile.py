@@ -147,9 +147,7 @@ def lca_duplication_loss_reconciliation(
                         str(terminal.name) for terminal in gene_node.get_terminals()
                     ),
                     "support": (
-                        float(gene_node.confidence)
-                        if gene_node.confidence is not None
-                        else None
+                        float(gene_node.confidence) if gene_node.confidence is not None else None
                     ),
                 }
             )
