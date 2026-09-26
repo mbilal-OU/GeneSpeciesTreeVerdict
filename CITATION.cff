@@ -8,11 +8,12 @@ authors:
 repository-code: "https://github.com/mbilal-OU/GeneSpeciesTreeVerdict"
 url: "https://github.com/mbilal-OU/GeneSpeciesTreeVerdict"
 license: MIT
-version: 0.1.0
+version: 0.2.0
 abstract: >-
-  A phylogenomic diagnostic toolkit for comparing gene trees with a reference species tree,
-  screening copy-number and duplication signals, quantifying topology discordance, and
-  producing transparent locus-handling assessments.
+  An evidence-integration and phylogenomic decision-support framework for comparing gene
+  trees with a reference species tree, separating observations from causal claims,
+  screening copy-number and duplication signals, quantifying topology discordance,
+  and routing loci toward transparent follow-up analyses.
 keywords:
   - phylogenetics
   - phylogenomics
@@ -21,3 +22,5 @@ keywords:
   - reconciliation
   - orthology
   - paralogy
+  - discordance
+  - decision support
