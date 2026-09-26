@@ -2,7 +2,12 @@ from pathlib import Path
 
 import pytest
 
-from genespeciestreeverdict.io import MappingRecord, mapping_for_family, read_mapping_table, read_tree
+from genespeciestreeverdict.io import (
+    MappingRecord,
+    mapping_for_family,
+    read_mapping_table,
+    read_tree,
+)
 
 
 def test_three_column_mapping_with_header(tutorial_dir):
