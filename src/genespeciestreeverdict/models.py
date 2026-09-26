@@ -45,12 +45,44 @@ class ReconciliationSummary:
 
 
 @dataclass(slots=True)
+class EvidenceItem:
+    """One transparent line of evidence used in a locus assessment."""
+
+    key: str
+    domain: str
+    signal: str
+    observation: str
+    interpretation: str
+    limitation: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(slots=True)
+class NextAnalysis:
+    """A question-driven follow-up analysis suggestion."""
+
+    priority: str
+    question: str
+    action: str
+    tools: list[str] = field(default_factory=list)
+    rationale: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(slots=True)
 class Verdict:
     """Workflow recommendation, not a claim of biological truth."""
 
     status: str
     topology_signal: str
+    primary_concern: str
     reasons: list[str]
+    supported_conclusions: list[str]
+    unsupported_conclusions: list[str]
     recommended_action: str
     caution: str
 
@@ -73,9 +105,10 @@ class LocusResult:
     species_overlap_events: list[dict[str, Any]]
     topology: TopologyMetrics
     reconciliation: ReconciliationSummary
+    evidence: list[EvidenceItem]
+    next_analyses: list[NextAnalysis]
     verdict: Verdict
     warnings: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
-        payload = asdict(self)
-        return payload
+        return asdict(self)

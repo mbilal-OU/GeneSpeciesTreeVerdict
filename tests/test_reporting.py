@@ -20,7 +20,15 @@ def test_single_locus_reporting_and_plot(tutorial_dir, tmp_path):
         title="demo",
     )
     assert (out / "summary.tsv").exists()
+    assert (out / "evidence_matrix.tsv").exists()
+    assert (out / "next_analyses.tsv").exists()
     assert (out / "report.md").exists()
     assert (out / "comparison.png").exists()
     payload = json.loads((out / "result.json").read_text())
     assert payload["verdict"]["status"] == "PASS"
+    assert payload["evidence"]
+    assert payload["next_analyses"]
+    report = (out / "report.md").read_text()
+    assert "What the current evidence supports" in report
+    assert "does **not** establish" in report
+    assert "Next analyses" in report

@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "genespeciestreeverdict"
-version = "0.1.0"
-description = "Diagnose gene-tree/species-tree discordance and evaluate loci for phylogenomic use."
+version = "0.2.0"
+description = "Evidence integration and decision support for gene-tree/species-tree discordance."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -20,7 +20,9 @@ keywords = [
   "species tree",
   "tree reconciliation",
   "orthology",
-  "paralogy"
+  "paralogy",
+  "discordance",
+  "decision support"
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",

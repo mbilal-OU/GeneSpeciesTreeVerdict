@@ -9,7 +9,7 @@ runner = CliRunner()
 def test_version_command():
     result = runner.invoke(app, ["version"])
     assert result.exit_code == 0
-    assert "0.1.0" in result.stdout
+    assert "0.2.0" in result.stdout
 
 
 def test_tutorial_command(tmp_path):
@@ -18,6 +18,20 @@ def test_tutorial_command(tmp_path):
     assert result.exit_code == 0
     assert (out / "species_tree.nwk").exists()
     assert (out / "mapping.tsv").exists()
+
+
+def test_explain_command():
+    result = runner.invoke(app, ["explain", "paralogy"])
+    assert result.exit_code == 0
+    assert "Orthology and paralogy" in result.stdout
+    assert "discordant single-copy" in result.stdout
+
+
+def test_explain_list_command():
+    result = runner.invoke(app, ["explain", "list"])
+    assert result.exit_code == 0
+    assert "discordance" in result.stdout
+    assert "marker-selection" in result.stdout
 
 
 def test_analyze_cli(tutorial_dir, tmp_path):
@@ -39,7 +53,10 @@ def test_analyze_cli(tutorial_dir, tmp_path):
     )
     assert result.exit_code == 0, result.stdout
     assert "PASS" in result.stdout
+    assert "Top next question" in result.stdout
     assert (out / "result.json").exists()
+    assert (out / "evidence_matrix.tsv").exists()
+    assert (out / "next_analyses.tsv").exists()
 
 
 def test_batch_cli(tutorial_dir, tmp_path):
@@ -61,3 +78,5 @@ def test_batch_cli(tutorial_dir, tmp_path):
     assert result.exit_code == 0, result.stdout
     assert "RESOLVE" in result.stdout
     assert (out / "locus_summary.tsv").exists()
+    assert (out / "evidence_matrix.tsv").exists()
+    assert (out / "recommendations.tsv").exists()

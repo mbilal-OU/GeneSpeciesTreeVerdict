@@ -9,6 +9,62 @@ from typing import Iterable
 from .models import LocusResult
 
 
+def _write_evidence_table(results: list[LocusResult], path: Path) -> None:
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle, delimiter="\t")
+        writer.writerow(
+            [
+                "family",
+                "evidence_key",
+                "domain",
+                "signal",
+                "observation",
+                "interpretation",
+                "limitation",
+            ]
+        )
+        for result in results:
+            for item in result.evidence:
+                writer.writerow(
+                    [
+                        result.family,
+                        item.key,
+                        item.domain,
+                        item.signal,
+                        item.observation,
+                        item.interpretation,
+                        item.limitation,
+                    ]
+                )
+
+
+def _write_recommendations(results: list[LocusResult], path: Path) -> None:
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle, delimiter="\t")
+        writer.writerow(
+            [
+                "family",
+                "priority",
+                "question",
+                "action",
+                "example_tools_or_workflows",
+                "rationale",
+            ]
+        )
+        for result in results:
+            for item in result.next_analyses:
+                writer.writerow(
+                    [
+                        result.family,
+                        item.priority,
+                        item.question,
+                        item.action,
+                        " | ".join(item.tools),
+                        item.rationale,
+                    ]
+                )
+
+
 def write_locus_outputs(result: LocusResult, outdir: str | Path) -> Path:
     outdir = Path(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
@@ -22,6 +78,7 @@ def write_locus_outputs(result: LocusResult, outdir: str | Path) -> Path:
             [
                 "family",
                 "verdict",
+                "primary_concern",
                 "topology_signal",
                 "coverage",
                 "max_copies",
@@ -30,12 +87,14 @@ def write_locus_outputs(result: LocusResult, outdir: str | Path) -> Path:
                 "inferred_losses",
                 "rf_distance",
                 "normalized_rf",
+                "top_next_question",
             ]
         )
         writer.writerow(
             [
                 result.family,
                 result.verdict.status,
+                result.verdict.primary_concern,
                 result.verdict.topology_signal,
                 f"{result.coverage:.6f}",
                 result.max_copies,
@@ -48,13 +107,18 @@ def write_locus_outputs(result: LocusResult, outdir: str | Path) -> Path:
                     if result.topology.normalized_rf is not None
                     else "NA"
                 ),
+                result.next_analyses[0].question if result.next_analyses else "NA",
             ]
         )
+
+    _write_evidence_table([result], outdir / "evidence_matrix.tsv")
+    _write_recommendations([result], outdir / "next_analyses.tsv")
 
     report = [
         f"# GeneSpeciesTreeVerdict report: {result.family}",
         "",
         f"**Verdict:** `{result.verdict.status}`  ",
+        f"**Primary concern:** `{result.verdict.primary_concern}`  ",
         f"**Topology signal:** `{result.verdict.topology_signal}`",
         "",
         "## Core metrics",
@@ -69,16 +133,34 @@ def write_locus_outputs(result: LocusResult, outdir: str | Path) -> Path:
         f"| Species-overlap duplication candidates | {result.species_overlap_duplications} |",
         f"| LCA-DL duplications | {result.reconciliation.lca_duplications} |",
         f"| LCA-DL inferred losses | {result.reconciliation.inferred_losses} |",
-        f"| RF distance | {result.topology.rf_distance if result.topology.rf_distance is not None else 'NA'} |",
+        (
+            f"| RF distance | {result.topology.rf_distance} |"
+            if result.topology.rf_distance is not None
+            else "| RF distance | NA |"
+        ),
         (
             f"| Normalized RF | {result.topology.normalized_rf:.3f} |"
             if result.topology.normalized_rf is not None
             else "| Normalized RF | NA |"
         ),
         "",
-        "## Why this verdict?",
+        "## Evidence matrix",
         "",
+        "| Domain | Signal | Observation | Interpretation | Limitation |",
+        "|---|---|---|---|---|",
     ]
+    for item in result.evidence:
+        report.append(
+            f"| {item.domain} | `{item.signal}` | {item.observation} | "
+            f"{item.interpretation} | {item.limitation} |"
+        )
+
+    report.extend(["", "## What the current evidence supports", ""])
+    report.extend(f"- {statement}" for statement in result.verdict.supported_conclusions)
+    report.extend(["", "## What the current evidence does **not** establish", ""])
+    report.extend(f"- {statement}" for statement in result.verdict.unsupported_conclusions)
+
+    report.extend(["", "## Why this verdict?", ""])
     report.extend(f"- {reason}" for reason in result.verdict.reasons)
     report.extend(
         [
@@ -87,9 +169,25 @@ def write_locus_outputs(result: LocusResult, outdir: str | Path) -> Path:
             "",
             result.verdict.recommended_action,
             "",
-            "> " + result.verdict.caution,
+            "## Next analyses",
+            "",
         ]
     )
+    for index, item in enumerate(result.next_analyses, start=1):
+        report.extend(
+            [
+                f"### {index}. [{item.priority}] {item.question}",
+                "",
+                item.action,
+                "",
+                f"**Why:** {item.rationale}",
+                "",
+                "**Example tools/workflows:** " + "; ".join(item.tools),
+                "",
+            ]
+        )
+
+    report.extend(["> " + result.verdict.caution])
     if result.warnings:
         report.extend(["", "## Interpretation warnings", ""])
         report.extend(f"- {warning}" for warning in result.warnings)
@@ -112,6 +210,7 @@ def write_batch_outputs(
             [
                 "family",
                 "verdict",
+                "primary_concern",
                 "topology_signal",
                 "coverage",
                 "gene_leaves",
@@ -124,13 +223,17 @@ def write_batch_outputs(
                 "rf_distance",
                 "normalized_rf",
                 "species_split_recovery",
+                "top_next_question",
+                "top_recommended_tools",
             ]
         )
         for result in results:
+            top_next = result.next_analyses[0] if result.next_analyses else None
             writer.writerow(
                 [
                     result.family,
                     result.verdict.status,
+                    result.verdict.primary_concern,
                     result.verdict.topology_signal,
                     f"{result.coverage:.6f}",
                     result.gene_leaves,
@@ -153,6 +256,8 @@ def write_batch_outputs(
                         if result.topology.species_split_recovery is not None
                         else "NA"
                     ),
+                    top_next.question if top_next else "NA",
+                    " | ".join(top_next.tools) if top_next else "NA",
                 ]
             )
 
@@ -160,6 +265,8 @@ def write_batch_outputs(
         json.dumps([result.to_dict() for result in results], indent=2) + "\n",
         encoding="utf-8",
     )
+    _write_evidence_table(results, outdir / "evidence_matrix.tsv")
+    _write_recommendations(results, outdir / "recommendations.tsv")
 
     if errors:
         with (outdir / "errors.tsv").open("w", newline="", encoding="utf-8") as handle:
@@ -167,8 +274,6 @@ def write_batch_outputs(
             writer.writeheader()
             writer.writerows(errors)
 
-    # Aggregate support for full-taxon, single-copy trees only. This avoids pretending that
-    # partially sampled gene trees test a reference split that they cannot actually resolve.
     full_single = [
         result
         for result in results
@@ -202,6 +307,7 @@ def write_batch_outputs(
                 writer.writerow([split, count, f"{count / len(full_single):.6f}"])
 
     verdict_counts = Counter(result.verdict.status for result in results)
+    concern_counts = Counter(result.verdict.primary_concern for result in results)
     report = [
         "# GeneSpeciesTreeVerdict batch report",
         "",
@@ -216,14 +322,26 @@ def write_batch_outputs(
     report.extend(
         [
             "",
-            "## How to read this report",
+            "## Primary concerns",
             "",
-            "- `PASS`: structurally suitable candidate for conventional single-copy concatenation.",
-            "- `REVIEW`: requires interpretation before inclusion; discordance is not automatically paralogy.",
-            "- `RESOLVE`: multi-copy/duplication evidence means orthology should be resolved before conventional concatenation.",
+            "| Concern | Loci |",
+            "|---|---:|",
+        ]
+    )
+    report.extend(f"| {concern} | {count} |" for concern, count in concern_counts.most_common())
+    report.extend(
+        [
             "",
-            "For full-taxon single-copy loci, `reference_split_support.tsv` asks the reverse question too: "
-            "how consistently do independent gene trees support each branch of the supplied species tree?",
+            "## How to use the outputs",
+            "",
+            "- `locus_summary.tsv`: one-row-per-locus decision summary.",
+            "- `evidence_matrix.tsv`: long-form observation/interpretation/limitation table.",
+            "- `recommendations.tsv`: prioritized questions and example specialist tools/workflows.",
+            "- `reference_split_support.tsv`: support for each supplied species-tree split across full-taxon single-copy loci.",
+            "- `alternative_splits.tsv`: recurrent alternatives to the supplied reference splits.",
+            "",
+            "`PASS`, `REVIEW`, and `RESOLVE` are workflow states, not claims that one tree is true or "
+            "that a particular evolutionary process has been proven.",
         ]
     )
     (outdir / "report.md").write_text("\n".join(report) + "\n", encoding="utf-8")

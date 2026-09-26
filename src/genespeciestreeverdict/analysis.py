@@ -4,6 +4,8 @@ from collections import Counter
 from pathlib import Path
 
 from .decision import make_verdict
+from .evidence import build_evidence
+from .guidance import recommend_next_analyses
 from .io import (
     MappingRecord,
     family_name_from_path,
@@ -86,6 +88,24 @@ def analyze_locus(
         discordance_review_threshold=discordance_review_threshold,
     )
 
+    evidence = build_evidence(
+        coverage=coverage,
+        min_coverage=min_coverage,
+        max_copies=max_copies,
+        multicopy_species=multicopy_species,
+        overlap_duplications=len(overlap_events),
+        topology=topology,
+        reconciliation=reconciliation,
+    )
+    next_analyses = recommend_next_analyses(
+        coverage=coverage,
+        min_coverage=min_coverage,
+        max_copies=max_copies,
+        overlap_duplications=len(overlap_events),
+        topology=topology,
+        reconciliation=reconciliation,
+    )
+
     warnings: list[str] = []
     if reconcile:
         warnings.append(
@@ -111,6 +131,8 @@ def analyze_locus(
         species_overlap_events=overlap_events,
         topology=topology,
         reconciliation=reconciliation,
+        evidence=evidence,
+        next_analyses=next_analyses,
         verdict=verdict,
         warnings=warnings,
     )
