@@ -140,7 +140,9 @@ def write_batch_outputs(
                     result.species_overlap_duplications,
                     result.reconciliation.lca_duplications,
                     result.reconciliation.inferred_losses,
-                    result.topology.rf_distance if result.topology.rf_distance is not None else "NA",
+                    result.topology.rf_distance
+                    if result.topology.rf_distance is not None
+                    else "NA",
                     (
                         f"{result.topology.normalized_rf:.6f}"
                         if result.topology.normalized_rf is not None
@@ -181,10 +183,14 @@ def write_batch_outputs(
             "w", newline="", encoding="utf-8"
         ) as handle:
             writer = csv.writer(handle, delimiter="\t")
-            writer.writerow(["reference_split", "genes_tested", "genes_supporting", "support_fraction"])
+            writer.writerow(
+                ["reference_split", "genes_tested", "genes_supporting", "support_fraction"]
+            )
             for split in reference_splits:
                 supporting = sum(split in result.topology.gene_splits for result in full_single)
-                writer.writerow([split, len(full_single), supporting, f"{supporting / len(full_single):.6f}"])
+                writer.writerow(
+                    [split, len(full_single), supporting, f"{supporting / len(full_single):.6f}"]
+                )
 
         alternatives: Counter[str] = Counter()
         for result in full_single:
