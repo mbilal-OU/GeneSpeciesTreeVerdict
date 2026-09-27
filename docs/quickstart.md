@@ -2,6 +2,14 @@
 
 ## Install
 
+GeneSpeciesTreeVerdict requires Python 3.10 or newer and is currently tested on Python 3.10–3.13. Check your interpreter before creating the environment:
+
+```bash
+python --version
+```
+
+Then create an isolated environment and install the development dependencies:
+
 ```bash
 git clone https://github.com/mbilal-OU/GeneSpeciesTreeVerdict.git
 cd GeneSpeciesTreeVerdict
